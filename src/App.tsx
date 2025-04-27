@@ -1,5 +1,5 @@
-import { FormEvent, useState } from "react";
-import { Loader, Placeholder } from "@aws-amplify/ui-react";
+import { FormEvent, useEffect, useState } from "react";
+import { Loader, Placeholder, } from "@aws-amplify/ui-react";
 import "./App.css";
 import { Amplify } from "aws-amplify";
 import { Schema } from "../amplify/data/resource";
@@ -9,7 +9,8 @@ import outputs from "../amplify_outputs.json";
 import "@aws-amplify/ui-react/styles.css";
 
 
-Amplify.configure(outputs)
+Amplify.configure(outputs);
+console.log("Amplify Config:", outputs);
 
 const amplifyClient = generateClient<Schema>({
   authMode: "userPool",
@@ -25,20 +26,30 @@ function App() {
 
     try {
       const formData = new FormData(event.currentTarget);
+
       formData.forEach((value, key) => {
         console.log(`key: ${key} \nvalue: ${value}`);
       });
-      const { data, errors } = await amplifyClient.queries.askBedrock({
+
+      const response = await amplifyClient.queries.askBedrock({
         ingredients: [formData.get("ingredients")?.toString() || ""],
       });
-      if (!errors) {
-        setResult(data?.body || "No data returned");
+
+      console.log("Full Response:", response);
+
+      if (response.errors) {
+        console.error("GraphQL errors:", response.errors);
+        setResult(`Error: ${response.errors}`);
+      } else if (response.data?.body) {
+        setResult(response.data.body);
       } else {
-        console.log(errors);
+        console.log(response.errors);
+        setResult("No recipe could be generated. Please try again.");
       }
 
     } catch (error) {
-      alert(`An error occured: ${error}`);
+      console.error("Error submitting form:", error);
+      setResult(`An error occurred: ${error instanceof Error ? error.message : String(error)}`);
     } finally {
       setLoading(false);
     }
@@ -67,9 +78,7 @@ function App() {
             name="ingredients"
             placeholder="Ingredient1, Ingredient2, Ingredient3,...etc"
           />
-          <button type="submit" className="search-button">
-            Generate
-          </button>
+          <button type="submit" className="search-button">Generate recipe</button>
         </div>
       </form>
       <div className="result-container">

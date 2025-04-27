@@ -1,7 +1,7 @@
 import { defineBackend } from '@aws-amplify/backend';
 import { auth } from './auth/resource';
 import { data } from './data/resource';
-import { PolicyStatement } from "aws-cdk-lib/aws-iam";
+import { Effect, PolicyStatement } from "aws-cdk-lib/aws-iam";
 
 
 /**
@@ -23,11 +23,19 @@ const bedrockDataSource = backend.data.resources.graphqlApi.addHttpDataSource(
   }
 );
 
+// Grant explicit permissions to invoke Bedrock models
 bedrockDataSource.grantPrincipal.addToPrincipalPolicy(
   new PolicyStatement({
-    resources: [
-      "arn:aws:bedrock:us-east-1::foundation-model/anthropic.claude-3-sonnet-20240229-v1:0"
+    effect: Effect.ALLOW,
+    actions: [
+      "bedrock:InvokeModel",
+      "bedrock:InvokeModelWithResponseStream"
     ],
-    actions: ["bedrock:InvokeModel"],
+    resources: [
+      // Use a valid model ID that you have access to
+      "arn:aws:bedrock:us-east-1::foundation-model/anthropic.claude-3-sonnet-20240229-v1:0",
+      // Add other models as needed
+      "arn:aws:bedrock:us-east-1::foundation-model/amazon.titan-text-express-v1"
+    ],
   })
 );
