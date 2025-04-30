@@ -1,0 +1,106 @@
+@use 'sass:color'; // Import the color module for color manipulation
+
+$signout-btn-color: #000; // Define your color variable here
+$generate-btn-color: #007bff; // Define your color variable here
+
+/* signout button */
+.signout {
+    display: inline-block;
+    padding: .75rem 1.25rem;
+    border: none;
+    border-radius: 10rem;
+    color: #fff;
+    // text-transform: uppercase;
+    // font-size: 1rem;
+    // letter-spacing: .15rem;
+    transition: all .3s;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+
+    &:after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: $signout-btn-color;
+        border-radius: 10rem;
+        z-index: -2;
+    }
+
+    &:before {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 0%;
+        height: 100%;
+        background-color: color.scale($signout-btn-color, $lightness: 20%);
+        transition: all .3s;
+        border-radius: 10rem;
+        z-index: -1;
+    }
+
+    &:hover {
+        color: #fff;
+
+        &:before {
+            width: 100%;
+        }
+    }
+
+
+}
+
+/* generate button */
+.generate {
+    display: inline-block;
+    padding: .75rem 1.25rem;
+    border: none;
+    border-radius: 10rem;
+    color: #fff;
+    // text-transform: uppercase;
+    // font-size: 1rem;
+    // letter-spacing: .15rem;
+    transition: all .3s;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+
+    &:after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: $generate-btn-color;
+        border-radius: 10rem;
+        z-index: -2;
+    }
+
+    &:before {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 0%;
+        height: 100%;
+        background-color: color.scale($generate-btn-color, $lightness: 20%);
+        transition: all .3s;
+        border-radius: 10rem;
+        z-index: -1;
+    }
+
+    &:hover {
+        color: #fff;
+
+        &:before {
+            width: 100%;
+        }
+    }
+
+
+}
