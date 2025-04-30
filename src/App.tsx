@@ -1,14 +1,12 @@
 import { FormEvent, useState } from "react";
-import { Loader, Placeholder, } from "@aws-amplify/ui-react";
+import { Authenticator, Loader, Placeholder, useAuthenticator, } from "@aws-amplify/ui-react";
 import "./App.css";
 import "./styles/buttons.scss";
 import { Amplify } from "aws-amplify";
 import { Schema } from "../amplify/data/resource";
 import { generateClient } from "aws-amplify/data";
 import outputs from "../amplify_outputs.json";
-
 import "@aws-amplify/ui-react/styles.css";
-
 
 Amplify.configure(outputs);
 console.log("Amplify Config:", outputs);
@@ -18,25 +16,36 @@ const amplifyClient = generateClient<Schema>({
 })
 
 function App() {
+  const { signOut, authStatus } = useAuthenticator((context) => [context.user, context.authStatus]);
+
   const [result, setResult] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
 
+  const handleSignOut = () => {
+    console.log("Signing out...");
+    // console.log("Auth Status:", authStatus);
+    // console.log("User:", user);
+    // console.log("signOut function: ", signOut);
+    signOut();
+  }
+
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
     setLoading(true);
 
     try {
       const formData = new FormData(event.currentTarget);
-
-      formData.forEach((value, key) => {
-        console.log(`key: ${key} \nvalue: ${value}`);
-      });
+      // DEBUG
+      // formData.forEach((value, key) => {
+      //   console.log(`key: ${key} \nvalue: ${value}`);
+      // });
 
       const response = await amplifyClient.queries.askBedrock({
         ingredients: [formData.get("ingredients")?.toString() || ""],
       });
 
-      console.log("Full Response:", response);
+      // console.log("Full Response:", response);
 
       if (response.errors) {
         console.error("GraphQL errors:", response.errors);
@@ -56,10 +65,16 @@ function App() {
     }
   };
 
+  if (authStatus !== "authenticated") {
+    return (
+      <Authenticator /> 
+    )
+  } 
+
   return (
     <div className="">
       <div className="nav">
-        <button className="signout">Sign Out</button>
+        <button onClick={handleSignOut} className="signout">Sign Out</button>
       </div>
       <div className="app-container">
         <div className="header-container">
@@ -83,8 +98,8 @@ function App() {
               name="ingredients"
               placeholder="Ingredient1, Ingredient2, Ingredient3,...etc"
             />
-            <button type="submit" className="search-button generate">Generate recipe</button>
-            
+            <button type="submit" className="generate_btn">Generate recipe</button>
+
           </div>
         </form>
         <div className="result-container">

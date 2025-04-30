@@ -6,8 +6,8 @@ import { Authenticator } from '@aws-amplify/ui-react'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <Authenticator>
-      <App />
-    </Authenticator>
+    <Authenticator.Provider>
+        <App />
+    </Authenticator.Provider>
   </StrictMode>
 )
